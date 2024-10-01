@@ -1,0 +1,850 @@
+---
+title: test
+---
+
+## `zenml.test` `special`
+
+Implementation of the Argilla annotation integration.
+
+### `ArgillaAnnotator`
+ ([Integration](/integrations-integration/#zenml.integrations.integration.Integration "zenml.integrations.integration.Integration"))
+
+Class to interact with the Argilla annotation interface.
+<Accordion
+  title="Source code in `zenml/test/test.py`"
+>
+```py
+class ArgillaAnnotator:
+@property
+def config(self -> ArgillaAnnotatorConfig):
+    """
+    Returns the `ArgillaAnnotatorConfig` config.
+
+        Returns:
+            The configuration.
+    """
+    return cast[ArgillaAnnotatorConfig, self._config]
+@property
+def settings_class(self -> Type[ArgillaAnnotatorSettings]):
+    """
+    Settings class for the Argilla annotator.
+
+        Returns:
+            The settings class.
+    """
+    return ArgillaAnnotatorSettings
+def get_url(self -> str):
+    """
+    Gets the top-level URL of the annotation interface.
+
+        Returns:
+            The URL of the annotation interface.
+    """
+    return IfExp(ExprIfExp { range: 2074..2196, test: Attribute(ExprAttribute { range: 2138..2154, value: Attribute(ExprAttribute { range: 2138..2149, value: Name(ExprName { range: 2138..2142, id: Identifier("self"), ctx: Load }), attr: Identifier("config"), ctx: Load }), attr: Identifier("port"), ctx: Load }), body: JoinedStr(ExprJoinedStr { range: 2074..2122, values: [FormattedValue(ExprFormattedValue { range: 2074..2122, value: Attribute(ExprAttribute { range: 2077..2101, value: Attribute(ExprAttribute { range: 2077..2088, value: Name(ExprName { range: 2077..2081, id: Identifier("self"), ctx: Load }), attr: Identifier("config"), ctx: Load }), attr: Identifier("instance_url"), ctx: Load }), conversion: None, format_spec: None }), Constant(ExprConstant { range: 2074..2122, value: Str(":"), kind: None }), FormattedValue(ExprFormattedValue { range: 2074..2122, value: Attribute(ExprAttribute { range: 2104..2120, value: Attribute(ExprAttribute { range: 2104..2115, value: Name(ExprName { range: 2104..2108, id: Identifier("self"), ctx: Load }), attr: Identifier("config"), ctx: Load }), attr: Identifier("port"), ctx: Load }), conversion: None, format_spec: None })] }), orelse: Attribute(ExprAttribute { range: 2172..2196, value: Attribute(ExprAttribute { range: 2172..2183, value: Name(ExprName { range: 2172..2176, id: Identifier("self"), ctx: Load }), attr: Identifier("config"), ctx: Load }), attr: Identifier("instance_url"), ctx: Load }) })
+def _get_client(self -> ArgillaClient):
+    """
+    Gets Argilla client.
+
+        Returns:
+            Argilla client.
+    """
+    config = self.config
+    init_kwargs = Dict(ExprDict { range: 2393..2420, keys: [Some(Constant(ExprConstant { range: 2394..2403, value: Str("api_url"), kind: None }))], values: [Call(ExprCall { range: 2405..2419, func: Attribute(ExprAttribute { range: 2405..2417, value: Name(ExprName { range: 2405..2409, id: Identifier("self"), ctx: Load }), attr: Identifier("get_url"), ctx: Load }), args: [], keywords: [] })] })
+    authentication_secret = self.get_authentication_secret[]
+    if BoolOp(ExprBoolOp { range: 2558..2598, op: And, values: [Attribute(ExprAttribute { range: 2558..2572, value: Name(ExprName { range: 2558..2564, id: Identifier("config"), ctx: Load }), attr: Identifier("api_key"), ctx: Load }), Name(ExprName { range: 2577..2598, id: Identifier("authentication_secret"), ctx: Load })] }):
+        api_key = config.api_key
+        logger.debug[Constant(ExprConstant { range: 2679..2774, value: Str("Both API key and authentication secret are provided. Using API key from settings as priority."), kind: None })]
+    else:
+        if authentication_secret:
+    api_key = authentication_secret.secret_values.get[Constant(ExprConstant { range: 2887..2896, value: Str("api_key"), kind: None }), Constant(ExprConstant { range: 2898..2900, value: Str(""), kind: None })]
+    logger.debug[Constant(ExprConstant { range: 2927..2955, value: Str("Using API key from secret."), kind: None })]
+else:
+    if Compare(ExprCompare { range: 2970..2996, left: Attribute(ExprAttribute { range: 2970..2984, value: Name(ExprName { range: 2970..2976, id: Identifier("config"), ctx: Load }), attr: Identifier("api_key"), ctx: Load }), ops: [IsNot], comparators: [Constant(ExprConstant { range: 2992..2996, value: None, kind: None })] }):
+    api_key = config.api_key
+    logger.debug[Constant(ExprConstant { range: 3060..3090, value: Str("Using API key from settings."), kind: None })]
+
+
+    if api_key:
+        init_kwargs[Constant(ExprConstant { range: 3137..3146, value: Str("api_key"), kind: None })] = api_key
+    if Compare(ExprCompare { range: 3170..3198, left: Attribute(ExprAttribute { range: 3170..3186, value: Name(ExprName { range: 3170..3176, id: Identifier("config"), ctx: Load }), attr: Identifier("workspace"), ctx: Load }), ops: [IsNot], comparators: [Constant(ExprConstant { range: 3194..3198, value: None, kind: None })] }):
+        init_kwargs[Constant(ExprConstant { range: 3224..3235, value: Str("workspace"), kind: None })] = config.workspace
+    if Compare(ExprCompare { range: 3267..3299, left: Attribute(ExprAttribute { range: 3267..3287, value: Name(ExprName { range: 3267..3273, id: Identifier("config"), ctx: Load }), attr: Identifier("extra_headers"), ctx: Load }), ops: [IsNot], comparators: [Constant(ExprConstant { range: 3295..3299, value: None, kind: None })] }):
+        init_kwargs[Constant(ExprConstant { range: 3325..3340, value: Str("extra_headers"), kind: None })] = json.loads[config.extra_headers]
+    if Compare(ExprCompare { range: 3388..3425, left: Attribute(ExprAttribute { range: 3388..3413, value: Name(ExprName { range: 3388..3394, id: Identifier("config"), ctx: Load }), attr: Identifier("httpx_extra_kwargs"), ctx: Load }), ops: [IsNot], comparators: [Constant(ExprConstant { range: 3421..3425, value: None, kind: None })] }):
+        init_kwargs[Constant(ExprConstant { range: 3451..3471, value: Str("httpx_extra_kwargs"), kind: None })] = json.loads[config.httpx_extra_kwargs]
+    # Unhandled statement: Try(StmtTry { range: 3552..3658, body: [Assign(StmtAssign { range: 3569..3591, targets: [Name(ExprName { range: 3569..3570, id: Identifier("_"), ctx: Store })], value: Call(ExprCall { range: 3573..3591, func: Attribute(ExprAttribute { range: 3573..3589, value: Name(ExprName { range: 3573..3575, id: Identifier("rg"), ctx: Load }), attr: Identifier("active_client"), ctx: Load }), args: [], keywords: [] }), type_comment: None })], handlers: [ExceptHandler(ExceptHandlerExceptHandler { range: 3600..3658, type_: Some(Name(ExprName { range: 3607..3622, id: Identifier("BaseClientError"), ctx: Load })), name: None, body: [Expr(StmtExpr { range: 3636..3658, value: Call(ExprCall { range: 3636..3658, func: Attribute(ExprAttribute { range: 3636..3643, value: Name(ExprName { range: 3636..3638, id: Identifier("rg"), ctx: Load }), attr: Identifier("init"), ctx: Load }), args: [], keywords: [Keyword { range: 3644..3657, arg: None, value: Name(ExprName { range: 3646..3657, id: Identifier("init_kwargs"), ctx: Load }) }] }) })] })], orelse: [], finalbody: [] })
+    return rg.active_client[]
+def get_url_for_dataset(self, dataset_name: str -> str):
+    """
+    Gets the URL of the annotation interface for the given dataset.
+
+        Args:
+            dataset_name: The name of the dataset.
+
+        Returns:
+            The URL of the annotation interface.
+    """
+    dataset_id = self.get_dataset[].id
+    return JoinedStr(ExprJoinedStr { range: 4058..4114, values: [FormattedValue(ExprFormattedValue { range: 4058..4114, value: Call(ExprCall { range: 4061..4075, func: Attribute(ExprAttribute { range: 4061..4073, value: Name(ExprName { range: 4061..4065, id: Identifier("self"), ctx: Load }), attr: Identifier("get_url"), ctx: Load }), args: [], keywords: [] }), conversion: None, format_spec: None }), Constant(ExprConstant { range: 4058..4114, value: Str("/dataset/"), kind: None }), FormattedValue(ExprFormattedValue { range: 4058..4114, value: Name(ExprName { range: 4086..4096, id: Identifier("dataset_id"), ctx: Load }), conversion: None, format_spec: None }), Constant(ExprConstant { range: 4058..4114, value: Str("/annotation-mode"), kind: None })] })
+def get_datasets(self -> List[Any]):
+    """
+    Gets the datasets currently available for annotation.
+
+        Returns:
+            A list of datasets.
+    """
+    old_datasets = self._get_client[].list_datasets[]
+    new_datasets = rg.FeedbackDataset.list[]
+    dataset_names = set[]
+    deduplicated_datasets = []
+    for dataset in new_datasets | old_datasets:
+        if Compare(ExprCompare { range: 4576..4609, left: Attribute(ExprAttribute { range: 4576..4588, value: Name(ExprName { range: 4576..4583, id: Identifier("dataset"), ctx: Load }), attr: Identifier("name"), ctx: Load }), ops: [NotIn], comparators: [Name(ExprName { range: 4596..4609, id: Identifier("dataset_names"), ctx: Load })] }):
+    dataset_names.add[dataset.name]
+    deduplicated_datasets.append[dataset]
+
+    return deduplicated_datasets
+def get_dataset_stats(self, dataset_name: str -> Tuple[int, int]):
+    """
+    Gets the statistics of the given dataset.
+
+        Args:
+            dataset_name: The name of the dataset.
+
+        Returns:
+            A tuple containing (labeled_task_count, unlabeled_task_count) for
+                the dataset.
+    """
+    dataset = self.get_dataset[]
+    labeled_task_count = len[dataset.filter_by[]]
+    unlabeled_task_count = len[dataset.filter_by[]]
+    return (labeled_task_count, unlabeled_task_count)
+def add_dataset(self -> Any):
+    """
+    Registers a dataset for annotation.
+
+        You must pass a `dataset_name` and a `dataset` object to this method.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the Argilla
+                client.
+
+        Returns:
+            An Argilla dataset object.
+
+        Raises:
+            ValueError: if 'dataset_name' and 'dataset' aren't provided.
+    """
+    dataset_name = kwargs.get[Constant(ExprConstant { range: 5887..5901, value: Str("dataset_name"), kind: None })]
+    dataset = kwargs.get[Constant(ExprConstant { range: 5932..5941, value: Str("dataset"), kind: None })]
+    if UnaryOp(ExprUnaryOp { range: 5955..5971, op: Not, operand: Name(ExprName { range: 5959..5971, id: Identifier("dataset_name"), ctx: Load }) }):
+        raise ValueError[Constant(ExprConstant { range: 6002..6048, value: Str("`dataset_name` keyword argument is required."), kind: None })]
+    else:
+        if Compare(ExprCompare { range: 6063..6078, left: Name(ExprName { range: 6063..6070, id: Identifier("dataset"), ctx: Load }), ops: [Is], comparators: [Constant(ExprConstant { range: 6074..6078, value: None, kind: None })] }):
+    raise ValueError[Constant(ExprConstant { range: 6109..6150, value: Str("`dataset` keyword argument is required."), kind: None })]
+
+    # Unhandled statement: Try(StmtTry { range: 6161..6634, body: [Expr(StmtExpr { range: 6178..6240, value: Call(ExprCall { range: 6178..6240, func: Attribute(ExprAttribute { range: 6178..6189, value: Name(ExprName { range: 6178..6184, id: Identifier("logger"), ctx: Load }), attr: Identifier("info"), ctx: Load }), args: [JoinedStr(ExprJoinedStr { range: 6190..6239, values: [Constant(ExprConstant { range: 6190..6239, value: Str("Pushing dataset '"), kind: None }), FormattedValue(ExprFormattedValue { range: 6190..6239, value: Name(ExprName { range: 6210..6222, id: Identifier("dataset_name"), ctx: Load }), conversion: None, format_spec: None }), Constant(ExprConstant { range: 6190..6239, value: Str("' to Argilla..."), kind: None })] })], keywords: [] }) }), Expr(StmtExpr { range: 6253..6295, value: Call(ExprCall { range: 6253..6295, func: Attribute(ExprAttribute { range: 6253..6276, value: Name(ExprName { range: 6253..6260, id: Identifier("dataset"), ctx: Load }), attr: Identifier("push_to_argilla"), ctx: Load }), args: [], keywords: [Keyword { range: 6277..6294, arg: Some(Identifier("name")), value: Name(ExprName { range: 6282..6294, id: Identifier("dataset_name"), ctx: Load }) }] }) }), Expr(StmtExpr { range: 6308..6369, value: Call(ExprCall { range: 6308..6369, func: Attribute(ExprAttribute { range: 6308..6319, value: Name(ExprName { range: 6308..6314, id: Identifier("logger"), ctx: Load }), attr: Identifier("info"), ctx: Load }), args: [JoinedStr(ExprJoinedStr { range: 6320..6368, values: [Constant(ExprConstant { range: 6320..6368, value: Str("Dataset '"), kind: None }), FormattedValue(ExprFormattedValue { range: 6320..6368, value: Name(ExprName { range: 6332..6344, id: Identifier("dataset_name"), ctx: Load }), conversion: None, format_spec: None }), Constant(ExprConstant { range: 6320..6368, value: Str("' pushed successfully."), kind: None })] })], keywords: [] }) })], handlers: [ExceptHandler(ExceptHandlerExceptHandler { range: 6378..6634, type_: Some(Name(ExprName { range: 6385..6394, id: Identifier("Exception"), ctx: Load })), name: Some(Identifier("e")), body: [Expr(StmtExpr { range: 6413..6520, value: Call(ExprCall { range: 6413..6520, func: Attribute(ExprAttribute { range: 6413..6425, value: Name(ExprName { range: 6413..6419, id: Identifier("logger"), ctx: Load }), attr: Identifier("error"), ctx: Load }), args: [JoinedStr(ExprJoinedStr { range: 6443..6506, values: [Constant(ExprConstant { range: 6443..6506, value: Str("Failed to push dataset '"), kind: None }), FormattedValue(ExprFormattedValue { range: 6443..6506, value: Name(ExprName { range: 6470..6482, id: Identifier("dataset_name"), ctx: Load }), conversion: None, format_spec: None }), Constant(ExprConstant { range: 6443..6506, value: Str("' to Argilla: "), kind: None }), FormattedValue(ExprFormattedValue { range: 6443..6506, value: Call(ExprCall { range: 6498..6504, func: Name(ExprName { range: 6498..6501, id: Identifier("str"), ctx: Load }), args: [Name(ExprName { range: 6502..6503, id: Identifier("e"), ctx: Load })], keywords: [] }), conversion: None, format_spec: None })] })], keywords: [] }) }), Raise(StmtRaise { range: 6533..6634, exc: Some(Call(ExprCall { range: 6539..6627, func: Name(ExprName { range: 6539..6549, id: Identifier("ValueError"), ctx: Load }), args: [JoinedStr(ExprJoinedStr { range: 6567..6613, values: [Constant(ExprConstant { range: 6567..6613, value: Str("Failed to push dataset to Argilla: "), kind: None }), FormattedValue(ExprFormattedValue { range: 6567..6613, value: Call(ExprCall { range: 6605..6611, func: Name(ExprName { range: 6605..6608, id: Identifier("str"), ctx: Load }), args: [Name(ExprName { range: 6609..6610, id: Identifier("e"), ctx: Load })], keywords: [] }), conversion: None, format_spec: None })] })], keywords: [] })), cause: Some(Name(ExprName { range: 6633..6634, id: Identifier("e"), ctx: Load })) })] })], orelse: [], finalbody: [] })
+    return self.get_dataset[]
+def delete_dataset(self -> Constant(ExprConstant { range: 6742..6746, value: None, kind: None })):
+    """
+    Deletes a dataset from the annotation interface.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the Argilla
+                client.
+
+        Raises:
+            ValueError: If the dataset name is not provided.
+    """
+    dataset_name = kwargs.get[Constant(ExprConstant { range: 7045..7059, value: Str("dataset_name"), kind: None })]
+    if UnaryOp(ExprUnaryOp { range: 7072..7088, op: Not, operand: Name(ExprName { range: 7076..7088, id: Identifier("dataset_name"), ctx: Load }) }):
+        raise ValueError[Constant(ExprConstant { range: 7119..7165, value: Str("`dataset_name` keyword argument is required."), kind: None })]
+    # Unhandled statement: Try(StmtTry { range: 7176..7520, body: [Expr(StmtExpr { range: 7193..7237, value: Call(ExprCall { range: 7193..7237, func: Attribute(ExprAttribute { range: 7193..7218, value: Call(ExprCall { range: 7193..7211, func: Attribute(ExprAttribute { range: 7193..7209, value: Name(ExprName { range: 7193..7197, id: Identifier("self"), ctx: Load }), attr: Identifier("_get_client"), ctx: Load }), args: [], keywords: [] }), attr: Identifier("delete"), ctx: Load }), args: [], keywords: [Keyword { range: 7219..7236, arg: Some(Identifier("name")), value: Name(ExprName { range: 7224..7236, id: Identifier("dataset_name"), ctx: Load }) }] }) }), Expr(StmtExpr { range: 7250..7302, value: Call(ExprCall { range: 7250..7302, func: Attribute(ExprAttribute { range: 7250..7300, value: Call(ExprCall { range: 7250..7293, func: Attribute(ExprAttribute { range: 7250..7266, value: Name(ExprName { range: 7250..7254, id: Identifier("self"), ctx: Load }), attr: Identifier("get_dataset"), ctx: Load }), args: [], keywords: [Keyword { range: 7267..7292, arg: Some(Identifier("dataset_name")), value: Name(ExprName { range: 7280..7292, id: Identifier("dataset_name"), ctx: Load }) }] }), attr: Identifier("delete"), ctx: Load }), args: [], keywords: [] }) }), Expr(StmtExpr { range: 7315..7377, value: Call(ExprCall { range: 7315..7377, func: Attribute(ExprAttribute { range: 7315..7326, value: Name(ExprName { range: 7315..7321, id: Identifier("logger"), ctx: Load }), attr: Identifier("info"), ctx: Load }), args: [JoinedStr(ExprJoinedStr { range: 7327..7376, values: [Constant(ExprConstant { range: 7327..7376, value: Str("Dataset '"), kind: None }), FormattedValue(ExprFormattedValue { range: 7327..7376, value: Name(ExprName { range: 7339..7351, id: Identifier("dataset_name"), ctx: Load }), conversion: None, format_spec: None }), Constant(ExprConstant { range: 7327..7376, value: Str("' deleted successfully."), kind: None })] })], keywords: [] }) })], handlers: [ExceptHandler(ExceptHandlerExceptHandler { range: 7386..7520, type_: Some(Name(ExprName { range: 7393..7403, id: Identifier("ValueError"), ctx: Load })), name: None, body: [Expr(StmtExpr { range: 7417..7520, value: Call(ExprCall { range: 7417..7520, func: Attribute(ExprAttribute { range: 7417..7431, value: Name(ExprName { range: 7417..7423, id: Identifier("logger"), ctx: Load }), attr: Identifier("warning"), ctx: Load }), args: [JoinedStr(ExprJoinedStr { range: 7449..7506, values: [Constant(ExprConstant { range: 7449..7506, value: Str("Dataset '"), kind: None }), FormattedValue(ExprFormattedValue { range: 7449..7506, value: Name(ExprName { range: 7461..7473, id: Identifier("dataset_name"), ctx: Load }), conversion: None, format_spec: None }), Constant(ExprConstant { range: 7449..7506, value: Str("' not found. Skipping deletion."), kind: None })] })], keywords: [] }) })] })], orelse: [], finalbody: [] })
+def get_dataset(self -> Any):
+    """
+    Gets the dataset with the given name.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the Argilla client.
+
+        Returns:
+            The Argilla DatasetModel object for the given name.
+
+        Raises:
+            ValueError: If the dataset name is not provided or if the dataset
+                does not exist.
+    """
+    dataset_name = kwargs.get[Constant(ExprConstant { range: 7972..7986, value: Str("dataset_name"), kind: None })]
+    if UnaryOp(ExprUnaryOp { range: 7999..8015, op: Not, operand: Name(ExprName { range: 8003..8015, id: Identifier("dataset_name"), ctx: Load }) }):
+        raise ValueError[Constant(ExprConstant { range: 8046..8092, value: Str("`dataset_name` keyword argument is required."), kind: None })]
+    # Unhandled statement: Try(StmtTry { range: 8103..8544, body: [If(StmtIf { range: 8120..8351, test: Compare(ExprCompare { range: 8123..8185, left: Call(ExprCall { range: 8123..8173, func: Attribute(ExprAttribute { range: 8123..8154, value: Attribute(ExprAttribute { range: 8123..8141, value: Name(ExprName { range: 8123..8125, id: Identifier("rg"), ctx: Load }), attr: Identifier("FeedbackDataset"), ctx: Load }), attr: Identifier("from_argilla"), ctx: Load }), args: [], keywords: [Keyword { range: 8155..8172, arg: Some(Identifier("name")), value: Name(ExprName { range: 8160..8172, id: Identifier("dataset_name"), ctx: Load }) }] }), ops: [IsNot], comparators: [Constant(ExprConstant { range: 8181..8185, value: None, kind: None })] }), body: [Return(StmtReturn { range: 8203..8260, value: Some(Call(ExprCall { range: 8210..8260, func: Attribute(ExprAttribute { range: 8210..8241, value: Attribute(ExprAttribute { range: 8210..8228, value: Name(ExprName { range: 8210..8212, id: Identifier("rg"), ctx: Load }), attr: Identifier("FeedbackDataset"), ctx: Load }), attr: Identifier("from_argilla"), ctx: Load }), args: [], keywords: [Keyword { range: 8242..8259, arg: Some(Identifier("name")), value: Name(ExprName { range: 8247..8259, id: Identifier("dataset_name"), ctx: Load }) }] })) })], orelse: [Return(StmtReturn { range: 8295..8351, value: Some(Call(ExprCall { range: 8302..8351, func: Attribute(ExprAttribute { range: 8302..8332, value: Call(ExprCall { range: 8302..8320, func: Attribute(ExprAttribute { range: 8302..8318, value: Name(ExprName { range: 8302..8306, id: Identifier("self"), ctx: Load }), attr: Identifier("_get_client"), ctx: Load }), args: [], keywords: [] }), attr: Identifier("get_dataset"), ctx: Load }), args: [], keywords: [Keyword { range: 8333..8350, arg: Some(Identifier("name")), value: Name(ExprName { range: 8338..8350, id: Identifier("dataset_name"), ctx: Load }) }] })) })] })], handlers: [ExceptHandler(ExceptHandlerExceptHandler { range: 8360..8544, type_: Some(Tuple(ExprTuple { range: 8367..8397, elts: [Name(ExprName { range: 8368..8384, id: Identifier("NotFoundApiError"), ctx: Load }), Name(ExprName { range: 8386..8396, id: Identifier("ValueError"), ctx: Load })], ctx: Load })), name: Some(Identifier("e")), body: [Expr(StmtExpr { range: 8416..8468, value: Call(ExprCall { range: 8416..8468, func: Attribute(ExprAttribute { range: 8416..8428, value: Name(ExprName { range: 8416..8422, id: Identifier("logger"), ctx: Load }), attr: Identifier("error"), ctx: Load }), args: [JoinedStr(ExprJoinedStr { range: 8429..8467, values: [Constant(ExprConstant { range: 8429..8467, value: Str("Dataset '"), kind: None }), FormattedValue(ExprFormattedValue { range: 8429..8467, value: Name(ExprName { range: 8441..8453, id: Identifier("dataset_name"), ctx: Load }), conversion: None, format_spec: None }), Constant(ExprConstant { range: 8429..8467, value: Str("' not found."), kind: None })] })], keywords: [] }) }), Raise(StmtRaise { range: 8481..8544, exc: Some(Call(ExprCall { range: 8487..8537, func: Name(ExprName { range: 8487..8497, id: Identifier("ValueError"), ctx: Load }), args: [JoinedStr(ExprJoinedStr { range: 8498..8536, values: [Constant(ExprConstant { range: 8498..8536, value: Str("Dataset '"), kind: None }), FormattedValue(ExprFormattedValue { range: 8498..8536, value: Name(ExprName { range: 8510..8522, id: Identifier("dataset_name"), ctx: Load }), conversion: None, format_spec: None }), Constant(ExprConstant { range: 8498..8536, value: Str("' not found."), kind: None })] })], keywords: [] })), cause: Some(Name(ExprName { range: 8543..8544, id: Identifier("e"), ctx: Load })) })] })], orelse: [], finalbody: [] })
+def get_data_by_status(self, dataset_name: str, status: str -> Any):
+    """
+    Gets the dataset containing the data with the specified status.
+
+        Args:
+            dataset_name: The name of the dataset.
+            status: The response status to filter by ('submitted' for labeled,
+                'pending' for unlabeled).
+
+        Returns:
+            The dataset containing the data with the specified status.
+
+        Raises:
+            ValueError: If the dataset name is not provided.
+    """
+    if UnaryOp(ExprUnaryOp { range: 9071..9087, op: Not, operand: Name(ExprName { range: 9075..9087, id: Identifier("dataset_name"), ctx: Load }) }):
+        raise ValueError[Constant(ExprConstant { range: 9118..9156, value: Str("`dataset_name` argument is required."), kind: None })]
+    return self.get_dataset[].filter_by[]
+def get_labeled_data(self -> Any):
+    """
+    Gets the dataset containing the labeled data.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the Argilla client.
+
+        Returns:
+            The dataset containing the labeled data.
+
+        Raises:
+            ValueError: If the dataset name is not provided.
+    """
+    if NamedExpr(ExprNamedExpr { range: 9655..9697, target: Name(ExprName { range: 9655..9667, id: Identifier("dataset_name"), ctx: Store }), value: Call(ExprCall { range: 9671..9697, func: Attribute(ExprAttribute { range: 9671..9681, value: Name(ExprName { range: 9671..9677, id: Identifier("kwargs"), ctx: Load }), attr: Identifier("get"), ctx: Load }), args: [Constant(ExprConstant { range: 9682..9696, value: Str("dataset_name"), kind: None })], keywords: [] }) }):
+        return self.get_data_by_status[dataset_name]
+    else:
+        raise ValueError[Constant(ExprConstant { range: 9819..9865, value: Str("`dataset_name` keyword argument is required."), kind: None })]
+def get_unlabeled_data(self -> Any):
+    """
+    Gets the dataset containing the unlabeled data.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the Argilla client.
+
+        Returns:
+            The dataset containing the unlabeled data.
+
+        Raises:
+            ValueError: If the dataset name is not provided.
+    """
+    if NamedExpr(ExprNamedExpr { range: 10254..10296, target: Name(ExprName { range: 10254..10266, id: Identifier("dataset_name"), ctx: Store }), value: Call(ExprCall { range: 10270..10296, func: Attribute(ExprAttribute { range: 10270..10280, value: Name(ExprName { range: 10270..10276, id: Identifier("kwargs"), ctx: Load }), attr: Identifier("get"), ctx: Load }), args: [Constant(ExprConstant { range: 10281..10295, value: Str("dataset_name"), kind: None })], keywords: [] }) }):
+        return self.get_data_by_status[dataset_name]
+    else:
+        raise ValueError[Constant(ExprConstant { range: 10416..10462, value: Str("`dataset_name` keyword argument is required."), kind: None })]
+```
+</Accordion>
+
+#### `config()` ``
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| --- | --- | --- | --- |
+| `self` | `Any` |  | _required_ |
+Returns the `ArgillaAnnotatorConfig` config.
+
+        Returns:
+            The configuration.
+        
+<Accordion
+  title="Source code in `zenml/test/test.py`"
+
+>
+```py
+@property
+def config(self -> ArgillaAnnotatorConfig):
+    """
+    Returns the `ArgillaAnnotatorConfig` config.
+
+        Returns:
+            The configuration.
+    """
+    return cast[ArgillaAnnotatorConfig, self._config]
+```
+</Accordion>
+
+
+**Returns:**
+
+| Type | Description |
+| --- | --- |
+| `ArgillaAnnotatorConfig` |  |
+#### `settings_class()` ``
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| --- | --- | --- | --- |
+| `self` | `Any` |  | _required_ |
+Settings class for the Argilla annotator.
+
+        Returns:
+            The settings class.
+        
+<Accordion
+  title="Source code in `zenml/test/test.py`"
+
+>
+```py
+@property
+def settings_class(self -> Type[ArgillaAnnotatorSettings]):
+    """
+    Settings class for the Argilla annotator.
+
+        Returns:
+            The settings class.
+    """
+    return ArgillaAnnotatorSettings
+```
+</Accordion>
+
+
+**Returns:**
+
+| Type | Description |
+| --- | --- |
+| `Type[ArgillaAnnotatorSettings]` |  |
+#### `get_url()` ``
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| --- | --- | --- | --- |
+| `self` | `Any` |  | _required_ |
+Gets the top-level URL of the annotation interface.
+
+        Returns:
+            The URL of the annotation interface.
+        
+<Accordion
+  title="Source code in `zenml/test/test.py`"
+
+>
+```py
+def get_url(self -> str):
+    """
+    Gets the top-level URL of the annotation interface.
+
+        Returns:
+            The URL of the annotation interface.
+    """
+    return IfExp(ExprIfExp { range: 2074..2196, test: Attribute(ExprAttribute { range: 2138..2154, value: Attribute(ExprAttribute { range: 2138..2149, value: Name(ExprName { range: 2138..2142, id: Identifier("self"), ctx: Load }), attr: Identifier("config"), ctx: Load }), attr: Identifier("port"), ctx: Load }), body: JoinedStr(ExprJoinedStr { range: 2074..2122, values: [FormattedValue(ExprFormattedValue { range: 2074..2122, value: Attribute(ExprAttribute { range: 2077..2101, value: Attribute(ExprAttribute { range: 2077..2088, value: Name(ExprName { range: 2077..2081, id: Identifier("self"), ctx: Load }), attr: Identifier("config"), ctx: Load }), attr: Identifier("instance_url"), ctx: Load }), conversion: None, format_spec: None }), Constant(ExprConstant { range: 2074..2122, value: Str(":"), kind: None }), FormattedValue(ExprFormattedValue { range: 2074..2122, value: Attribute(ExprAttribute { range: 2104..2120, value: Attribute(ExprAttribute { range: 2104..2115, value: Name(ExprName { range: 2104..2108, id: Identifier("self"), ctx: Load }), attr: Identifier("config"), ctx: Load }), attr: Identifier("port"), ctx: Load }), conversion: None, format_spec: None })] }), orelse: Attribute(ExprAttribute { range: 2172..2196, value: Attribute(ExprAttribute { range: 2172..2183, value: Name(ExprName { range: 2172..2176, id: Identifier("self"), ctx: Load }), attr: Identifier("config"), ctx: Load }), attr: Identifier("instance_url"), ctx: Load }) })
+```
+</Accordion>
+
+
+**Returns:**
+
+| Type | Description |
+| --- | --- |
+| `str` |  |
+#### `_get_client()` ``
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| --- | --- | --- | --- |
+| `self` | `Any` |  | _required_ |
+Gets Argilla client.
+
+        Returns:
+            Argilla client.
+        
+<Accordion
+  title="Source code in `zenml/test/test.py`"
+
+>
+```py
+def _get_client(self -> ArgillaClient):
+    """
+    Gets Argilla client.
+
+        Returns:
+            Argilla client.
+    """
+    config = self.config
+    init_kwargs = Dict(ExprDict { range: 2393..2420, keys: [Some(Constant(ExprConstant { range: 2394..2403, value: Str("api_url"), kind: None }))], values: [Call(ExprCall { range: 2405..2419, func: Attribute(ExprAttribute { range: 2405..2417, value: Name(ExprName { range: 2405..2409, id: Identifier("self"), ctx: Load }), attr: Identifier("get_url"), ctx: Load }), args: [], keywords: [] })] })
+    authentication_secret = self.get_authentication_secret[]
+    if BoolOp(ExprBoolOp { range: 2558..2598, op: And, values: [Attribute(ExprAttribute { range: 2558..2572, value: Name(ExprName { range: 2558..2564, id: Identifier("config"), ctx: Load }), attr: Identifier("api_key"), ctx: Load }), Name(ExprName { range: 2577..2598, id: Identifier("authentication_secret"), ctx: Load })] }):
+        api_key = config.api_key
+        logger.debug[Constant(ExprConstant { range: 2679..2774, value: Str("Both API key and authentication secret are provided. Using API key from settings as priority."), kind: None })]
+    else:
+        if authentication_secret:
+    api_key = authentication_secret.secret_values.get[Constant(ExprConstant { range: 2887..2896, value: Str("api_key"), kind: None }), Constant(ExprConstant { range: 2898..2900, value: Str(""), kind: None })]
+    logger.debug[Constant(ExprConstant { range: 2927..2955, value: Str("Using API key from secret."), kind: None })]
+else:
+    if Compare(ExprCompare { range: 2970..2996, left: Attribute(ExprAttribute { range: 2970..2984, value: Name(ExprName { range: 2970..2976, id: Identifier("config"), ctx: Load }), attr: Identifier("api_key"), ctx: Load }), ops: [IsNot], comparators: [Constant(ExprConstant { range: 2992..2996, value: None, kind: None })] }):
+    api_key = config.api_key
+    logger.debug[Constant(ExprConstant { range: 3060..3090, value: Str("Using API key from settings."), kind: None })]
+
+
+    if api_key:
+        init_kwargs[Constant(ExprConstant { range: 3137..3146, value: Str("api_key"), kind: None })] = api_key
+    if Compare(ExprCompare { range: 3170..3198, left: Attribute(ExprAttribute { range: 3170..3186, value: Name(ExprName { range: 3170..3176, id: Identifier("config"), ctx: Load }), attr: Identifier("workspace"), ctx: Load }), ops: [IsNot], comparators: [Constant(ExprConstant { range: 3194..3198, value: None, kind: None })] }):
+        init_kwargs[Constant(ExprConstant { range: 3224..3235, value: Str("workspace"), kind: None })] = config.workspace
+    if Compare(ExprCompare { range: 3267..3299, left: Attribute(ExprAttribute { range: 3267..3287, value: Name(ExprName { range: 3267..3273, id: Identifier("config"), ctx: Load }), attr: Identifier("extra_headers"), ctx: Load }), ops: [IsNot], comparators: [Constant(ExprConstant { range: 3295..3299, value: None, kind: None })] }):
+        init_kwargs[Constant(ExprConstant { range: 3325..3340, value: Str("extra_headers"), kind: None })] = json.loads[config.extra_headers]
+    if Compare(ExprCompare { range: 3388..3425, left: Attribute(ExprAttribute { range: 3388..3413, value: Name(ExprName { range: 3388..3394, id: Identifier("config"), ctx: Load }), attr: Identifier("httpx_extra_kwargs"), ctx: Load }), ops: [IsNot], comparators: [Constant(ExprConstant { range: 3421..3425, value: None, kind: None })] }):
+        init_kwargs[Constant(ExprConstant { range: 3451..3471, value: Str("httpx_extra_kwargs"), kind: None })] = json.loads[config.httpx_extra_kwargs]
+    # Unhandled statement: Try(StmtTry { range: 3552..3658, body: [Assign(StmtAssign { range: 3569..3591, targets: [Name(ExprName { range: 3569..3570, id: Identifier("_"), ctx: Store })], value: Call(ExprCall { range: 3573..3591, func: Attribute(ExprAttribute { range: 3573..3589, value: Name(ExprName { range: 3573..3575, id: Identifier("rg"), ctx: Load }), attr: Identifier("active_client"), ctx: Load }), args: [], keywords: [] }), type_comment: None })], handlers: [ExceptHandler(ExceptHandlerExceptHandler { range: 3600..3658, type_: Some(Name(ExprName { range: 3607..3622, id: Identifier("BaseClientError"), ctx: Load })), name: None, body: [Expr(StmtExpr { range: 3636..3658, value: Call(ExprCall { range: 3636..3658, func: Attribute(ExprAttribute { range: 3636..3643, value: Name(ExprName { range: 3636..3638, id: Identifier("rg"), ctx: Load }), attr: Identifier("init"), ctx: Load }), args: [], keywords: [Keyword { range: 3644..3657, arg: None, value: Name(ExprName { range: 3646..3657, id: Identifier("init_kwargs"), ctx: Load }) }] }) })] })], orelse: [], finalbody: [] })
+    return rg.active_client[]
+```
+</Accordion>
+
+
+**Returns:**
+
+| Type | Description |
+| --- | --- |
+| `ArgillaClient` |  |
+#### `get_url_for_dataset()` ``
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| --- | --- | --- | --- |
+| `self` | `Any` |  | _required_ |
+| `dataset_name` | `str` |  | _required_ |
+Gets the URL of the annotation interface for the given dataset.
+
+        Args:
+            dataset_name: The name of the dataset.
+
+        Returns:
+            The URL of the annotation interface.
+        
+<Accordion
+  title="Source code in `zenml/test/test.py`"
+
+>
+```py
+def get_url_for_dataset(self, dataset_name: str -> str):
+    """
+    Gets the URL of the annotation interface for the given dataset.
+
+        Args:
+            dataset_name: The name of the dataset.
+
+        Returns:
+            The URL of the annotation interface.
+    """
+    dataset_id = self.get_dataset[].id
+    return JoinedStr(ExprJoinedStr { range: 4058..4114, values: [FormattedValue(ExprFormattedValue { range: 4058..4114, value: Call(ExprCall { range: 4061..4075, func: Attribute(ExprAttribute { range: 4061..4073, value: Name(ExprName { range: 4061..4065, id: Identifier("self"), ctx: Load }), attr: Identifier("get_url"), ctx: Load }), args: [], keywords: [] }), conversion: None, format_spec: None }), Constant(ExprConstant { range: 4058..4114, value: Str("/dataset/"), kind: None }), FormattedValue(ExprFormattedValue { range: 4058..4114, value: Name(ExprName { range: 4086..4096, id: Identifier("dataset_id"), ctx: Load }), conversion: None, format_spec: None }), Constant(ExprConstant { range: 4058..4114, value: Str("/annotation-mode"), kind: None })] })
+```
+</Accordion>
+
+
+**Returns:**
+
+| Type | Description |
+| --- | --- |
+| `str` |  |
+#### `get_datasets()` ``
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| --- | --- | --- | --- |
+| `self` | `Any` |  | _required_ |
+Gets the datasets currently available for annotation.
+
+        Returns:
+            A list of datasets.
+        
+<Accordion
+  title="Source code in `zenml/test/test.py`"
+
+>
+```py
+def get_datasets(self -> List[Any]):
+    """
+    Gets the datasets currently available for annotation.
+
+        Returns:
+            A list of datasets.
+    """
+    old_datasets = self._get_client[].list_datasets[]
+    new_datasets = rg.FeedbackDataset.list[]
+    dataset_names = set[]
+    deduplicated_datasets = []
+    for dataset in new_datasets | old_datasets:
+        if Compare(ExprCompare { range: 4576..4609, left: Attribute(ExprAttribute { range: 4576..4588, value: Name(ExprName { range: 4576..4583, id: Identifier("dataset"), ctx: Load }), attr: Identifier("name"), ctx: Load }), ops: [NotIn], comparators: [Name(ExprName { range: 4596..4609, id: Identifier("dataset_names"), ctx: Load })] }):
+    dataset_names.add[dataset.name]
+    deduplicated_datasets.append[dataset]
+
+    return deduplicated_datasets
+```
+</Accordion>
+
+
+**Returns:**
+
+| Type | Description |
+| --- | --- |
+| `List[Any]` |  |
+#### `get_dataset_stats()` ``
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| --- | --- | --- | --- |
+| `self` | `Any` |  | _required_ |
+| `dataset_name` | `str` |  | _required_ |
+Gets the statistics of the given dataset.
+
+        Args:
+            dataset_name: The name of the dataset.
+
+        Returns:
+            A tuple containing (labeled_task_count, unlabeled_task_count) for
+                the dataset.
+        
+<Accordion
+  title="Source code in `zenml/test/test.py`"
+
+>
+```py
+def get_dataset_stats(self, dataset_name: str -> Tuple[int, int]):
+    """
+    Gets the statistics of the given dataset.
+
+        Args:
+            dataset_name: The name of the dataset.
+
+        Returns:
+            A tuple containing (labeled_task_count, unlabeled_task_count) for
+                the dataset.
+    """
+    dataset = self.get_dataset[]
+    labeled_task_count = len[dataset.filter_by[]]
+    unlabeled_task_count = len[dataset.filter_by[]]
+    return (labeled_task_count, unlabeled_task_count)
+```
+</Accordion>
+
+
+**Returns:**
+
+| Type | Description |
+| --- | --- |
+| `Tuple[int, int]` |  |
+#### `add_dataset()` ``
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| --- | --- | --- | --- |
+| `self` | `Any` |  | _required_ |
+Registers a dataset for annotation.
+
+        You must pass a `dataset_name` and a `dataset` object to this method.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the Argilla
+                client.
+
+        Returns:
+            An Argilla dataset object.
+
+        Raises:
+            ValueError: if 'dataset_name' and 'dataset' aren't provided.
+        
+<Accordion
+  title="Source code in `zenml/test/test.py`"
+
+>
+```py
+def add_dataset(self -> Any):
+    """
+    Registers a dataset for annotation.
+
+        You must pass a `dataset_name` and a `dataset` object to this method.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the Argilla
+                client.
+
+        Returns:
+            An Argilla dataset object.
+
+        Raises:
+            ValueError: if 'dataset_name' and 'dataset' aren't provided.
+    """
+    dataset_name = kwargs.get[Constant(ExprConstant { range: 5887..5901, value: Str("dataset_name"), kind: None })]
+    dataset = kwargs.get[Constant(ExprConstant { range: 5932..5941, value: Str("dataset"), kind: None })]
+    if UnaryOp(ExprUnaryOp { range: 5955..5971, op: Not, operand: Name(ExprName { range: 5959..5971, id: Identifier("dataset_name"), ctx: Load }) }):
+        raise ValueError[Constant(ExprConstant { range: 6002..6048, value: Str("`dataset_name` keyword argument is required."), kind: None })]
+    else:
+        if Compare(ExprCompare { range: 6063..6078, left: Name(ExprName { range: 6063..6070, id: Identifier("dataset"), ctx: Load }), ops: [Is], comparators: [Constant(ExprConstant { range: 6074..6078, value: None, kind: None })] }):
+    raise ValueError[Constant(ExprConstant { range: 6109..6150, value: Str("`dataset` keyword argument is required."), kind: None })]
+
+    # Unhandled statement: Try(StmtTry { range: 6161..6634, body: [Expr(StmtExpr { range: 6178..6240, value: Call(ExprCall { range: 6178..6240, func: Attribute(ExprAttribute { range: 6178..6189, value: Name(ExprName { range: 6178..6184, id: Identifier("logger"), ctx: Load }), attr: Identifier("info"), ctx: Load }), args: [JoinedStr(ExprJoinedStr { range: 6190..6239, values: [Constant(ExprConstant { range: 6190..6239, value: Str("Pushing dataset '"), kind: None }), FormattedValue(ExprFormattedValue { range: 6190..6239, value: Name(ExprName { range: 6210..6222, id: Identifier("dataset_name"), ctx: Load }), conversion: None, format_spec: None }), Constant(ExprConstant { range: 6190..6239, value: Str("' to Argilla..."), kind: None })] })], keywords: [] }) }), Expr(StmtExpr { range: 6253..6295, value: Call(ExprCall { range: 6253..6295, func: Attribute(ExprAttribute { range: 6253..6276, value: Name(ExprName { range: 6253..6260, id: Identifier("dataset"), ctx: Load }), attr: Identifier("push_to_argilla"), ctx: Load }), args: [], keywords: [Keyword { range: 6277..6294, arg: Some(Identifier("name")), value: Name(ExprName { range: 6282..6294, id: Identifier("dataset_name"), ctx: Load }) }] }) }), Expr(StmtExpr { range: 6308..6369, value: Call(ExprCall { range: 6308..6369, func: Attribute(ExprAttribute { range: 6308..6319, value: Name(ExprName { range: 6308..6314, id: Identifier("logger"), ctx: Load }), attr: Identifier("info"), ctx: Load }), args: [JoinedStr(ExprJoinedStr { range: 6320..6368, values: [Constant(ExprConstant { range: 6320..6368, value: Str("Dataset '"), kind: None }), FormattedValue(ExprFormattedValue { range: 6320..6368, value: Name(ExprName { range: 6332..6344, id: Identifier("dataset_name"), ctx: Load }), conversion: None, format_spec: None }), Constant(ExprConstant { range: 6320..6368, value: Str("' pushed successfully."), kind: None })] })], keywords: [] }) })], handlers: [ExceptHandler(ExceptHandlerExceptHandler { range: 6378..6634, type_: Some(Name(ExprName { range: 6385..6394, id: Identifier("Exception"), ctx: Load })), name: Some(Identifier("e")), body: [Expr(StmtExpr { range: 6413..6520, value: Call(ExprCall { range: 6413..6520, func: Attribute(ExprAttribute { range: 6413..6425, value: Name(ExprName { range: 6413..6419, id: Identifier("logger"), ctx: Load }), attr: Identifier("error"), ctx: Load }), args: [JoinedStr(ExprJoinedStr { range: 6443..6506, values: [Constant(ExprConstant { range: 6443..6506, value: Str("Failed to push dataset '"), kind: None }), FormattedValue(ExprFormattedValue { range: 6443..6506, value: Name(ExprName { range: 6470..6482, id: Identifier("dataset_name"), ctx: Load }), conversion: None, format_spec: None }), Constant(ExprConstant { range: 6443..6506, value: Str("' to Argilla: "), kind: None }), FormattedValue(ExprFormattedValue { range: 6443..6506, value: Call(ExprCall { range: 6498..6504, func: Name(ExprName { range: 6498..6501, id: Identifier("str"), ctx: Load }), args: [Name(ExprName { range: 6502..6503, id: Identifier("e"), ctx: Load })], keywords: [] }), conversion: None, format_spec: None })] })], keywords: [] }) }), Raise(StmtRaise { range: 6533..6634, exc: Some(Call(ExprCall { range: 6539..6627, func: Name(ExprName { range: 6539..6549, id: Identifier("ValueError"), ctx: Load }), args: [JoinedStr(ExprJoinedStr { range: 6567..6613, values: [Constant(ExprConstant { range: 6567..6613, value: Str("Failed to push dataset to Argilla: "), kind: None }), FormattedValue(ExprFormattedValue { range: 6567..6613, value: Call(ExprCall { range: 6605..6611, func: Name(ExprName { range: 6605..6608, id: Identifier("str"), ctx: Load }), args: [Name(ExprName { range: 6609..6610, id: Identifier("e"), ctx: Load })], keywords: [] }), conversion: None, format_spec: None })] })], keywords: [] })), cause: Some(Name(ExprName { range: 6633..6634, id: Identifier("e"), ctx: Load })) })] })], orelse: [], finalbody: [] })
+    return self.get_dataset[]
+```
+</Accordion>
+
+
+**Returns:**
+
+| Type | Description |
+| --- | --- |
+| `Any` |  |
+#### `delete_dataset()` ``
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| --- | --- | --- | --- |
+| `self` | `Any` |  | _required_ |
+Deletes a dataset from the annotation interface.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the Argilla
+                client.
+
+        Raises:
+            ValueError: If the dataset name is not provided.
+        
+<Accordion
+  title="Source code in `zenml/test/test.py`"
+
+>
+```py
+def delete_dataset(self -> Constant(ExprConstant { range: 6742..6746, value: None, kind: None })):
+    """
+    Deletes a dataset from the annotation interface.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the Argilla
+                client.
+
+        Raises:
+            ValueError: If the dataset name is not provided.
+    """
+    dataset_name = kwargs.get[Constant(ExprConstant { range: 7045..7059, value: Str("dataset_name"), kind: None })]
+    if UnaryOp(ExprUnaryOp { range: 7072..7088, op: Not, operand: Name(ExprName { range: 7076..7088, id: Identifier("dataset_name"), ctx: Load }) }):
+        raise ValueError[Constant(ExprConstant { range: 7119..7165, value: Str("`dataset_name` keyword argument is required."), kind: None })]
+    # Unhandled statement: Try(StmtTry { range: 7176..7520, body: [Expr(StmtExpr { range: 7193..7237, value: Call(ExprCall { range: 7193..7237, func: Attribute(ExprAttribute { range: 7193..7218, value: Call(ExprCall { range: 7193..7211, func: Attribute(ExprAttribute { range: 7193..7209, value: Name(ExprName { range: 7193..7197, id: Identifier("self"), ctx: Load }), attr: Identifier("_get_client"), ctx: Load }), args: [], keywords: [] }), attr: Identifier("delete"), ctx: Load }), args: [], keywords: [Keyword { range: 7219..7236, arg: Some(Identifier("name")), value: Name(ExprName { range: 7224..7236, id: Identifier("dataset_name"), ctx: Load }) }] }) }), Expr(StmtExpr { range: 7250..7302, value: Call(ExprCall { range: 7250..7302, func: Attribute(ExprAttribute { range: 7250..7300, value: Call(ExprCall { range: 7250..7293, func: Attribute(ExprAttribute { range: 7250..7266, value: Name(ExprName { range: 7250..7254, id: Identifier("self"), ctx: Load }), attr: Identifier("get_dataset"), ctx: Load }), args: [], keywords: [Keyword { range: 7267..7292, arg: Some(Identifier("dataset_name")), value: Name(ExprName { range: 7280..7292, id: Identifier("dataset_name"), ctx: Load }) }] }), attr: Identifier("delete"), ctx: Load }), args: [], keywords: [] }) }), Expr(StmtExpr { range: 7315..7377, value: Call(ExprCall { range: 7315..7377, func: Attribute(ExprAttribute { range: 7315..7326, value: Name(ExprName { range: 7315..7321, id: Identifier("logger"), ctx: Load }), attr: Identifier("info"), ctx: Load }), args: [JoinedStr(ExprJoinedStr { range: 7327..7376, values: [Constant(ExprConstant { range: 7327..7376, value: Str("Dataset '"), kind: None }), FormattedValue(ExprFormattedValue { range: 7327..7376, value: Name(ExprName { range: 7339..7351, id: Identifier("dataset_name"), ctx: Load }), conversion: None, format_spec: None }), Constant(ExprConstant { range: 7327..7376, value: Str("' deleted successfully."), kind: None })] })], keywords: [] }) })], handlers: [ExceptHandler(ExceptHandlerExceptHandler { range: 7386..7520, type_: Some(Name(ExprName { range: 7393..7403, id: Identifier("ValueError"), ctx: Load })), name: None, body: [Expr(StmtExpr { range: 7417..7520, value: Call(ExprCall { range: 7417..7520, func: Attribute(ExprAttribute { range: 7417..7431, value: Name(ExprName { range: 7417..7423, id: Identifier("logger"), ctx: Load }), attr: Identifier("warning"), ctx: Load }), args: [JoinedStr(ExprJoinedStr { range: 7449..7506, values: [Constant(ExprConstant { range: 7449..7506, value: Str("Dataset '"), kind: None }), FormattedValue(ExprFormattedValue { range: 7449..7506, value: Name(ExprName { range: 7461..7473, id: Identifier("dataset_name"), ctx: Load }), conversion: None, format_spec: None }), Constant(ExprConstant { range: 7449..7506, value: Str("' not found. Skipping deletion."), kind: None })] })], keywords: [] }) })] })], orelse: [], finalbody: [] })
+```
+</Accordion>
+
+
+**Returns:**
+
+| Type | Description |
+| --- | --- |
+| `Constant(ExprConstant { range: 6742..6746, value: None, kind: None })` |  |
+#### `get_dataset()` ``
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| --- | --- | --- | --- |
+| `self` | `Any` |  | _required_ |
+Gets the dataset with the given name.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the Argilla client.
+
+        Returns:
+            The Argilla DatasetModel object for the given name.
+
+        Raises:
+            ValueError: If the dataset name is not provided or if the dataset
+                does not exist.
+        
+<Accordion
+  title="Source code in `zenml/test/test.py`"
+
+>
+```py
+def get_dataset(self -> Any):
+    """
+    Gets the dataset with the given name.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the Argilla client.
+
+        Returns:
+            The Argilla DatasetModel object for the given name.
+
+        Raises:
+            ValueError: If the dataset name is not provided or if the dataset
+                does not exist.
+    """
+    dataset_name = kwargs.get[Constant(ExprConstant { range: 7972..7986, value: Str("dataset_name"), kind: None })]
+    if UnaryOp(ExprUnaryOp { range: 7999..8015, op: Not, operand: Name(ExprName { range: 8003..8015, id: Identifier("dataset_name"), ctx: Load }) }):
+        raise ValueError[Constant(ExprConstant { range: 8046..8092, value: Str("`dataset_name` keyword argument is required."), kind: None })]
+    # Unhandled statement: Try(StmtTry { range: 8103..8544, body: [If(StmtIf { range: 8120..8351, test: Compare(ExprCompare { range: 8123..8185, left: Call(ExprCall { range: 8123..8173, func: Attribute(ExprAttribute { range: 8123..8154, value: Attribute(ExprAttribute { range: 8123..8141, value: Name(ExprName { range: 8123..8125, id: Identifier("rg"), ctx: Load }), attr: Identifier("FeedbackDataset"), ctx: Load }), attr: Identifier("from_argilla"), ctx: Load }), args: [], keywords: [Keyword { range: 8155..8172, arg: Some(Identifier("name")), value: Name(ExprName { range: 8160..8172, id: Identifier("dataset_name"), ctx: Load }) }] }), ops: [IsNot], comparators: [Constant(ExprConstant { range: 8181..8185, value: None, kind: None })] }), body: [Return(StmtReturn { range: 8203..8260, value: Some(Call(ExprCall { range: 8210..8260, func: Attribute(ExprAttribute { range: 8210..8241, value: Attribute(ExprAttribute { range: 8210..8228, value: Name(ExprName { range: 8210..8212, id: Identifier("rg"), ctx: Load }), attr: Identifier("FeedbackDataset"), ctx: Load }), attr: Identifier("from_argilla"), ctx: Load }), args: [], keywords: [Keyword { range: 8242..8259, arg: Some(Identifier("name")), value: Name(ExprName { range: 8247..8259, id: Identifier("dataset_name"), ctx: Load }) }] })) })], orelse: [Return(StmtReturn { range: 8295..8351, value: Some(Call(ExprCall { range: 8302..8351, func: Attribute(ExprAttribute { range: 8302..8332, value: Call(ExprCall { range: 8302..8320, func: Attribute(ExprAttribute { range: 8302..8318, value: Name(ExprName { range: 8302..8306, id: Identifier("self"), ctx: Load }), attr: Identifier("_get_client"), ctx: Load }), args: [], keywords: [] }), attr: Identifier("get_dataset"), ctx: Load }), args: [], keywords: [Keyword { range: 8333..8350, arg: Some(Identifier("name")), value: Name(ExprName { range: 8338..8350, id: Identifier("dataset_name"), ctx: Load }) }] })) })] })], handlers: [ExceptHandler(ExceptHandlerExceptHandler { range: 8360..8544, type_: Some(Tuple(ExprTuple { range: 8367..8397, elts: [Name(ExprName { range: 8368..8384, id: Identifier("NotFoundApiError"), ctx: Load }), Name(ExprName { range: 8386..8396, id: Identifier("ValueError"), ctx: Load })], ctx: Load })), name: Some(Identifier("e")), body: [Expr(StmtExpr { range: 8416..8468, value: Call(ExprCall { range: 8416..8468, func: Attribute(ExprAttribute { range: 8416..8428, value: Name(ExprName { range: 8416..8422, id: Identifier("logger"), ctx: Load }), attr: Identifier("error"), ctx: Load }), args: [JoinedStr(ExprJoinedStr { range: 8429..8467, values: [Constant(ExprConstant { range: 8429..8467, value: Str("Dataset '"), kind: None }), FormattedValue(ExprFormattedValue { range: 8429..8467, value: Name(ExprName { range: 8441..8453, id: Identifier("dataset_name"), ctx: Load }), conversion: None, format_spec: None }), Constant(ExprConstant { range: 8429..8467, value: Str("' not found."), kind: None })] })], keywords: [] }) }), Raise(StmtRaise { range: 8481..8544, exc: Some(Call(ExprCall { range: 8487..8537, func: Name(ExprName { range: 8487..8497, id: Identifier("ValueError"), ctx: Load }), args: [JoinedStr(ExprJoinedStr { range: 8498..8536, values: [Constant(ExprConstant { range: 8498..8536, value: Str("Dataset '"), kind: None }), FormattedValue(ExprFormattedValue { range: 8498..8536, value: Name(ExprName { range: 8510..8522, id: Identifier("dataset_name"), ctx: Load }), conversion: None, format_spec: None }), Constant(ExprConstant { range: 8498..8536, value: Str("' not found."), kind: None })] })], keywords: [] })), cause: Some(Name(ExprName { range: 8543..8544, id: Identifier("e"), ctx: Load })) })] })], orelse: [], finalbody: [] })
+```
+</Accordion>
+
+
+**Returns:**
+
+| Type | Description |
+| --- | --- |
+| `Any` |  |
+#### `get_data_by_status()` ``
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| --- | --- | --- | --- |
+| `self` | `Any` |  | _required_ |
+| `dataset_name` | `str` |  | _required_ |
+| `status` | `str` |  | _required_ |
+Gets the dataset containing the data with the specified status.
+
+        Args:
+            dataset_name: The name of the dataset.
+            status: The response status to filter by ('submitted' for labeled,
+                'pending' for unlabeled).
+
+        Returns:
+            The dataset containing the data with the specified status.
+
+        Raises:
+            ValueError: If the dataset name is not provided.
+        
+<Accordion
+  title="Source code in `zenml/test/test.py`"
+
+>
+```py
+def get_data_by_status(self, dataset_name: str, status: str -> Any):
+    """
+    Gets the dataset containing the data with the specified status.
+
+        Args:
+            dataset_name: The name of the dataset.
+            status: The response status to filter by ('submitted' for labeled,
+                'pending' for unlabeled).
+
+        Returns:
+            The dataset containing the data with the specified status.
+
+        Raises:
+            ValueError: If the dataset name is not provided.
+    """
+    if UnaryOp(ExprUnaryOp { range: 9071..9087, op: Not, operand: Name(ExprName { range: 9075..9087, id: Identifier("dataset_name"), ctx: Load }) }):
+        raise ValueError[Constant(ExprConstant { range: 9118..9156, value: Str("`dataset_name` argument is required."), kind: None })]
+    return self.get_dataset[].filter_by[]
+```
+</Accordion>
+
+
+**Returns:**
+
+| Type | Description |
+| --- | --- |
+| `Any` |  |
+#### `get_labeled_data()` ``
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| --- | --- | --- | --- |
+| `self` | `Any` |  | _required_ |
+Gets the dataset containing the labeled data.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the Argilla client.
+
+        Returns:
+            The dataset containing the labeled data.
+
+        Raises:
+            ValueError: If the dataset name is not provided.
+        
+<Accordion
+  title="Source code in `zenml/test/test.py`"
+
+>
+```py
+def get_labeled_data(self -> Any):
+    """
+    Gets the dataset containing the labeled data.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the Argilla client.
+
+        Returns:
+            The dataset containing the labeled data.
+
+        Raises:
+            ValueError: If the dataset name is not provided.
+    """
+    if NamedExpr(ExprNamedExpr { range: 9655..9697, target: Name(ExprName { range: 9655..9667, id: Identifier("dataset_name"), ctx: Store }), value: Call(ExprCall { range: 9671..9697, func: Attribute(ExprAttribute { range: 9671..9681, value: Name(ExprName { range: 9671..9677, id: Identifier("kwargs"), ctx: Load }), attr: Identifier("get"), ctx: Load }), args: [Constant(ExprConstant { range: 9682..9696, value: Str("dataset_name"), kind: None })], keywords: [] }) }):
+        return self.get_data_by_status[dataset_name]
+    else:
+        raise ValueError[Constant(ExprConstant { range: 9819..9865, value: Str("`dataset_name` keyword argument is required."), kind: None })]
+```
+</Accordion>
+
+
+**Returns:**
+
+| Type | Description |
+| --- | --- |
+| `Any` |  |
+#### `get_unlabeled_data()` ``
+
+
+**Parameters:**
+
+| Name | Type | Description | Default |
+| --- | --- | --- | --- |
+| `self` | `Any` |  | _required_ |
+Gets the dataset containing the unlabeled data.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the Argilla client.
+
+        Returns:
+            The dataset containing the unlabeled data.
+
+        Raises:
+            ValueError: If the dataset name is not provided.
+        
+<Accordion
+  title="Source code in `zenml/test/test.py`"
+
+>
+```py
+def get_unlabeled_data(self -> Any):
+    """
+    Gets the dataset containing the unlabeled data.
+
+        Args:
+            **kwargs: Additional keyword arguments to pass to the Argilla client.
+
+        Returns:
+            The dataset containing the unlabeled data.
+
+        Raises:
+            ValueError: If the dataset name is not provided.
+    """
+    if NamedExpr(ExprNamedExpr { range: 10254..10296, target: Name(ExprName { range: 10254..10266, id: Identifier("dataset_name"), ctx: Store }), value: Call(ExprCall { range: 10270..10296, func: Attribute(ExprAttribute { range: 10270..10280, value: Name(ExprName { range: 10270..10276, id: Identifier("kwargs"), ctx: Load }), attr: Identifier("get"), ctx: Load }), args: [Constant(ExprConstant { range: 10281..10295, value: Str("dataset_name"), kind: None })], keywords: [] }) }):
+        return self.get_data_by_status[dataset_name]
+    else:
+        raise ValueError[Constant(ExprConstant { range: 10416..10462, value: Str("`dataset_name` keyword argument is required."), kind: None })]
+```
+</Accordion>
+
+
+**Returns:**
+
+| Type | Description |
+| --- | --- |
+| `Any` |  |
